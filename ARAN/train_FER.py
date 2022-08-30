@@ -16,7 +16,6 @@ def parse_args():
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size.')
     parser.add_argument('--val_batch_size', type=int, default=64, help='Batch size for validation.')
     parser.add_argument('--optimizer', type=str, default="adam", help='Optimizer.')
-    parser.add_argument('--lr', type=float, default=0.01, help='Initial learning rate for sgd.')
     parser.add_argument('--workers', default=4, type=int, help='Number of data loading workers (default: 4)')
     parser.add_argument('--epochs', type=int, default=70, help='Total training epochs.')
     parser.add_argument('--wandb', action='store_true')
