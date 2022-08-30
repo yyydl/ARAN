@@ -24,6 +24,7 @@ class RafDataSet(data.Dataset):
         file_names = dataset.iloc[:, NAME_COLUMN].values
         self.label = dataset.iloc[:,
                      LABEL_COLUMN].values - 1  # 0:Surprise, 1:Fear, 2:Disgust, 3:Happiness, 4:Sadness, 5:Anger, 6:Neutral
+        
         self.file_paths = []
         # use raf-db aligned images for training/testing
         for f in file_names:
