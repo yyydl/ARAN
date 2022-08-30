@@ -111,8 +111,7 @@ def run_training():
             for batch_i, (imgs, targets, _) in enumerate(val_loader):
                 outputs = model(imgs.cuda())
                 targets = targets.cuda()
-
-                loss = CE_criterion(outputs, targets)
+                loss = LCE_criterion(outputs, targets)
                 val_loss += loss
                 iter_cnt += 1
                 _, predicts = torch.max(outputs, 1)
