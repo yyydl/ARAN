@@ -536,6 +536,7 @@ def wide_resnet50_2(pretrained=False, filter_size=4, _force_nonfinetuned=False, 
             raise ValueError('No pretrained model available')
     return model
 
+
 def wide_resnet101_2(pretrained=False, filter_size=4, _force_nonfinetuned=False, **kwargs):
     """Wide ResNet-101-2 model from
     `"Wide Residual Networks" <https://arxiv.org/pdf/1605.07146.pdf>`_

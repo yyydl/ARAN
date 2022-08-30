@@ -146,22 +146,5 @@ def run_training():
                 print("best_acc:" + str(best_acc))
 
 
-class LabelSmoothingCrossEntropy(nn.Module):
-    def __init__(self, eps=0.1, reduction='mean', ignore_index=-100):
-        super(LabelSmoothingCrossEntropy, self).__init__()
-        self.eps = eps
-        self.reduction = reduction
-        self.ignore_index = ignore_index
-
-    def forward(self, output, target):
-        c = output.size()[-1]
-        log_pred = torch.log_softmax(output, dim=-1)
-        loss = -log_pred.sum(dim=-1)
-        loss = loss.mean()
-        return loss * self.eps / c + (1 - self.eps) * F.nll_loss(log_pred, target,
-                                                               reduction=self.reduction,
-                                                               ignore_index=self.ignore_index)
-
-
 if __name__ == "__main__":
     run_training()
