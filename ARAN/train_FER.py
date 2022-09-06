@@ -73,8 +73,8 @@ def run_training():
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     model = model.cuda()
     model, optimizer = amp.initialize(model, optimizer, opt_level="O1", verbosity=0)
-    CE_criterion = torch.nn.CrossEntropyLoss()
-    LCE_criterion = LabelSmoothingCrossEntropy()
+    # criterion = torch.nn.CrossEntropyLoss()
+    criterion = LabelSmoothingCrossEntropy()
 
     best_acc = 0
     for i in range(1, args.epochs + 1):
@@ -88,7 +88,7 @@ def run_training():
             imgs = imgs.cuda()
             outputs = model(imgs)
             targets = targets.cuda()
-            loss = LCE_criterion(outputs, targets)
+            loss = criterion(outputs, targets)
             with amp.scale_loss(loss, optimizer) as scaled_loss:
                 scaled_loss.backward()
             optimizer.step()
@@ -110,7 +110,7 @@ def run_training():
             for batch_i, (imgs, targets, _) in enumerate(val_loader):
                 outputs = model(imgs.cuda())
                 targets = targets.cuda()
-                loss = CE_criterion(outputs, targets)
+                loss = criterion(outputs, targets)
                 val_loss += loss
                 iter_cnt += 1
                 _, predicts = torch.max(outputs, 1)
@@ -143,21 +143,23 @@ def run_training():
                 best_acc = val_acc
                 print("best_acc:" + str(best_acc))
 
+
 class LabelSmoothingCrossEntropy(nn.Module):
-    def __init__(self, eps=0.1, reduction='mean', ignore_index=-100):
+    def __init__(self, eps=0.1, reduction='mean'):
         super(LabelSmoothingCrossEntropy, self).__init__()
         self.eps = eps
         self.reduction = reduction
-        self.ignore_index = ignore_index
 
     def forward(self, output, target):
         c = output.size()[-1]
-        log_pred = torch.log_softmax(output, dim=-1)
-        loss = -log_pred.sum(dim=-1)
-        loss = loss.mean()
-        return loss * self.eps / c + (1 - self.eps) * F.nll_loss(log_pred, target,
-                                                               reduction=self.reduction,
-                                                               ignore_index=self.ignore_index)
+        log_preds = F.log_softmax(output, dim=-1)
+        if self.reduction=='sum':
+            loss = -log_preds.sum()
+        else:
+            loss = -log_preds.sum(dim=-1)
+            if self.reduction=='mean':
+                loss = loss.mean()
+        return loss*self.eps/c + (1-self.eps) * F.nll_loss(log_preds, target, reduction=self.reduction)
 
 
 if __name__ == "__main__":
